@@ -10,12 +10,7 @@ const client = new MongoClient(URL);
 
 const app = express();
 app.use(express.json());
-
-const corsOptions = {
-  origin: 'https://quiz-topaz-omega.vercel.app', // Substitua pelo URL do seu front-end
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 const dbName = "Users";
 const collectionName = "User-informations";
