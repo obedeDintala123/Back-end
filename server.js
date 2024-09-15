@@ -35,28 +35,30 @@ app.post("/signup", async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const existentUser = await collection.findOne({ name: req.body.name });
+    const { name, password } = req.body;
+
+    // Verifica se o usuário já existe no banco de dados
+    const existentUser = await collection.findOne({ name });
 
     if (existentUser) {
-      return res.status(400).json({ error: "Usuário já existente" });
+      // Se o usuário existe e a senha está correta, faz login
+      if (existentUser.password === password) {
+        return res.status(200).json({ message: "Login bem-sucedido", user: existentUser });
+      } else {
+        return res.status(400).json({ error: "Senha incorreta" });
+      }
     }
 
-    const result = await collection.insertOne({
-      name: req.body.name,
-      password: req.body.password,
-    });
-    console.log("Usuario criado com sucesso");
-    res.status(201).json({
-      id: result.insertedId,
-      name: req.body.name,
-      password: req.body.password,
-    });
-    
+    // Se o usuário não existir, cria uma nova conta
+    const result = await collection.insertOne({ name, password });
+    return res.status(201).json({ message: "Conta criada com sucesso", id: result.insertedId });
+
   } catch (error) {
-    console.error(error);
-    res.status(400).json({ error: "Internal Server Error" });
+    console.error("Erro ao verificar/criar usuário:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 /*Read*/
 
