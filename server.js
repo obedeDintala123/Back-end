@@ -93,6 +93,26 @@ app.delete("/signup/:id", async (req, res) => {
   }
 });
 
+/* Deletar Todos os Usuários */
+app.delete("/signup", async (req, res) => {
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    // Remove todos os documentos na coleção
+    const result = await collection.deleteMany({});
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "No users found to delete" });
+    }
+
+    res.status(200).json({ message: "Todos os usuários foram excluídos" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
